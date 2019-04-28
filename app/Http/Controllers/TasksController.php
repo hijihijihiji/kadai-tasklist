@@ -15,12 +15,22 @@ class TasksController extends Controller
      */
     public function index()
     {
-        $tasks = Task::all();
+        if (\Auth::check()) {
+
+        $tasks = \Auth::user()->tasks;
         
         return view('tasks.index', [
             'tasks' => $tasks,
             ]);
+            
+        }else {
+            
+            return view('welcome');
+            
+        }
     }
+    
+    
 
     /**
      * Show the form for creating a new resource.
@@ -29,11 +39,18 @@ class TasksController extends Controller
      */
     public function create()
     {
+        if (\Auth::check()) {
+            
         $task = new Task;
         
         return view('tasks.create', [
             'task' => $task,
             ]);
+            
+        }else {
+            
+            return redirect('/');
+        }
     }
 
     /**
@@ -44,16 +61,24 @@ class TasksController extends Controller
      */
     public function store(Request $request)
     {
+        if (\Auth::check()) {
+        
         $this->validate($request, [
             'status' => 'required|max:10',
             ]);
         
         $task = new Task;
+        $user = \Auth::user();
+        $task->user_id = $user->id;
         $task->status = $request->status;
         $task->content = $request->content;
         $task->save();
         
         return redirect('/');
+        
+        }else {
+            return view('welcome');
+        }
     }
 
     /**
@@ -64,11 +89,15 @@ class TasksController extends Controller
      */
     public function show($id)
     {
-        $task = Task::find($id);
+        $task = Task::find($id); 
+        if (\Auth::user()->id == $task->user_id) {
         
-        return view('tasks.show', [
-            'task' => $task,
-            ]);
+            return view('tasks.show', [
+                'task' => $task,
+                ]);
+        }else {
+            return redirect('/'); 
+        }
     }
 
     /**
@@ -80,10 +109,13 @@ class TasksController extends Controller
     public function edit($id)
     {
         $task = Task::find($id);
-        
-        return view('tasks.edit', [
-            'task' => $task,
-            ]);
+        if (\Auth::user()->id == $task->user_id) {
+            return view('tasks.edit', [
+                'task' => $task,
+                ]);
+        }else {
+            return redirect('/');
+        }
     }
 
     /**
@@ -99,11 +131,14 @@ class TasksController extends Controller
             'status' => 'required|max:10',
             ]);
         $task = Task::find($id);
-        $task->status = $request->status;
-        $task->content = $request->content;
-        $task->save();
+        if (\Auth::user()->id == $task->user_id) {
+            $task->status = $request->status;
+            $task->content = $request->content;
+            $task->save();
+        }
         
         return redirect('/');
+        
     }
 
     /**
@@ -115,8 +150,10 @@ class TasksController extends Controller
     public function destroy($id)
     {
         $task = Task::find($id);
-        $task->delete();
-        
+        if (\Auth::user()->id == $task->user_id) {
+            $task->delete();
+        }
         return redirect('/');
+        
     }
 }
