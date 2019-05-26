@@ -9,8 +9,8 @@ This is a simple task management application.
 
 ## Requirement
 
-- PHP 7.0.0
-- Laravel 5.5.*
-- Laravelcollective/html 5.5.*
-- bootstrap 4.2.1
+- PHP 7.x
+- Laravel 5.5
+- Laravelcollective/html 5.5
+- bootstrap 4.x
 
